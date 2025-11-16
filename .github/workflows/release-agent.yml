@@ -123,6 +123,15 @@ jobs:
       
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Prepare release files
+        run: |
+          mkdir -p release-files
+          # Copy all files from artifact directories
+          find artifacts -type f \( -name "*.tar.gz" -o -name "*.tar.gz.sha256" -o -name "*.deb" -o -name "*.deb.sha256" \) -exec cp {} release-files/ \;
+          ls -la release-files/
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -160,10 +169,7 @@ jobs:
             
             See [INSTALLATION.md](INSTALLATION.md) for detailed installation instructions.
           files: |
-            agent/release/*.tar.gz
-            agent/release/*.tar.gz.sha256
-            agent/release/*.deb
-            agent/release/*.deb.sha256
+            release-files/*
           draft: false
           prerelease: false
 
