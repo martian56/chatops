@@ -22,10 +22,10 @@
 
 ```bash
 # Download the .deb package from GitHub Releases
-wget https://github.com/your-org/chatops/releases/download/v1.0.3/chatops-agent_1.0.3_amd64.deb
+wget https://github.com/martian56/chatops/releases/download/v1.0.3/chatops-agent_1.0.3_amd64.deb
 
 # Install the package
-sudo dpkg -i chatops-agent_1.0.0_amd64.deb
+sudo dpkg -i chatops-agent_1.0.3_amd64.deb
 sudo apt-get install -f  # Install dependencies if needed
 
 # Edit the service file with your API key
@@ -49,7 +49,7 @@ sudo systemctl status chatops-agent
 
 ```bash
 # Download from GitHub Releases
-wget https://github.com/your-org/chatops/releases/download/v1.0.3/chatops-agent-linux-amd64-1.0.3.tar.gz
+wget https://github.com/martian56/chatops/releases/download/v1.0.3/chatops-agent-linux-amd64-1.0.3.tar.gz
 tar -xzf chatops-agent-linux-amd64-1.0.3.tar.gz
 
 # Run the agent
