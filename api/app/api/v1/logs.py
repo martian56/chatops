@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime
@@ -24,6 +24,12 @@ async def get_server_logs(
     current_user: User = Depends(get_current_user),
 ):
     """Get logs for a specific server"""
+    # Verify server ownership
+    from app.crud import server as crud_server
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Server not found")
+    
     logs = await crud_log_entry.get_log_entries(
         db,
         server_id=server_id,

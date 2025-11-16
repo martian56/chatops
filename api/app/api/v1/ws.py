@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.ws_manager import ws_manager
 from app.db.base import AsyncSessionLocal
 from app.crud.user import get_user
+from app.crud import server as crud_server
 from app.core.security import decode_access_token
 import uuid
 import json
@@ -44,11 +45,22 @@ async def metrics_websocket(
             await websocket.close(code=1008, reason="Invalid token")
             return
         
-        # Verify user exists (optional, for extra security)
+        # Verify user exists and owns the server
         async with AsyncSessionLocal() as db:
             user = await get_user(db, uuid.UUID(user_id))
             if not user:
                 await websocket.close(code=1008, reason="User not found")
+                return
+            
+            # Verify server ownership
+            try:
+                server_uuid = uuid.UUID(server_id)
+                server = await crud_server.get_server(db, server_uuid, user_id=user.id)
+                if not server:
+                    await websocket.close(code=1008, reason="Server not found or access denied")
+                    return
+            except ValueError:
+                await websocket.close(code=1008, reason="Invalid server ID")
                 return
     except Exception as e:
         await websocket.close(code=1008, reason=f"Authentication failed: {str(e)}")
@@ -111,11 +123,22 @@ async def logs_websocket(
             await websocket.close(code=1008, reason="Invalid token")
             return
         
-        # Verify user exists (optional, for extra security)
+        # Verify user exists and owns the server
         async with AsyncSessionLocal() as db:
             user = await get_user(db, uuid.UUID(user_id))
             if not user:
                 await websocket.close(code=1008, reason="User not found")
+                return
+            
+            # Verify server ownership
+            try:
+                server_uuid = uuid.UUID(server_id)
+                server = await crud_server.get_server(db, server_uuid, user_id=user.id)
+                if not server:
+                    await websocket.close(code=1008, reason="Server not found or access denied")
+                    return
+            except ValueError:
+                await websocket.close(code=1008, reason="Invalid server ID")
                 return
     except Exception as e:
         await websocket.close(code=1008, reason=f"Authentication failed: {str(e)}")

@@ -39,8 +39,42 @@ class MetricsCreate(BaseModel):
 async def receive_metrics(
     metrics: MetricsCreate,
     auth = Depends(get_current_user_or_api_key),
+    db: AsyncSession = Depends(get_db),
 ):
     """Receive metrics from an agent (API key auth)"""
+    # Verify authorization
+    if auth.get("type") == "api_key":
+        # For API key auth, verify the server_id matches the API key's server
+        api_key = auth["api_key"]
+        try:
+            server_uuid = uuid.UUID(metrics.server_id)
+            if api_key.server_id != server_uuid:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="API key does not belong to this server"
+                )
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid server_id format"
+            )
+    elif auth.get("type") == "user":
+        # For user auth, verify server ownership
+        user = auth["user"]
+        try:
+            server_uuid = uuid.UUID(metrics.server_id)
+            server = await crud_server.get_server(db, server_uuid, user_id=user.id)
+            if not server:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Server not found or access denied"
+                )
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid server_id format"
+            )
+    
     server_id_str = str(metrics.server_id)
     
     # Convert to dict for caching
@@ -67,8 +101,28 @@ async def receive_metrics_by_id(
     server_id: uuid.UUID,
     metrics: MetricsCreate,
     auth = Depends(get_current_user_or_api_key),
+    db: AsyncSession = Depends(get_db),
 ):
     """Receive metrics from an agent (endpoint with server_id in path)"""
+    # Verify authorization
+    if auth.get("type") == "api_key":
+        # For API key auth, verify the server_id matches the API key's server
+        api_key = auth["api_key"]
+        if api_key.server_id != server_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="API key does not belong to this server"
+            )
+    elif auth.get("type") == "user":
+        # For user auth, verify server ownership
+        user = auth["user"]
+        server = await crud_server.get_server(db, server_id, user_id=user.id)
+        if not server:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Server not found or access denied"
+            )
+    
     # Use server_id from path (more reliable)
     server_id_str = str(server_id)
     
@@ -97,8 +151,8 @@ async def get_latest_metrics(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get latest metrics for a server"""
-    server = await crud_server.get_server(db, server_id)
+    """Get latest metrics for a server (only if owned by current user)"""
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -121,8 +175,8 @@ async def get_metrics_history(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get metrics history for a server"""
-    server = await crud_server.get_server(db, server_id)
+    """Get metrics history for a server (only if owned by current user)"""
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     

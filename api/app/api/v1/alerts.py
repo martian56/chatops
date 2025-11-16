@@ -25,8 +25,10 @@ async def get_alert_thresholds(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get all alert thresholds, optionally filtered by server"""
-    thresholds = await crud_alert.get_alert_thresholds(db, server_id=server_id)
+    """Get all alert thresholds for user's servers, optionally filtered by server"""
+    thresholds = await crud_alert.get_alert_thresholds(
+        db, server_id=server_id, user_id=current_user.id
+    )
     return [AlertThreshold.model_validate(t) for t in thresholds]
 
 
@@ -38,8 +40,10 @@ async def get_alerts(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get all alerts, optionally filtered by resolved status"""
-    alerts = await crud_alert.get_alerts(db, skip=skip, limit=limit, resolved=resolved)
+    """Get all alerts for user's servers, optionally filtered by resolved status"""
+    alerts = await crud_alert.get_alerts(
+        db, skip=skip, limit=limit, resolved=resolved, user_id=current_user.id
+    )
     return [AlertResponse.model_validate(a) for a in alerts]
 
 
@@ -49,8 +53,8 @@ async def get_alert(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get alert by ID"""
-    alert = await crud_alert.get_alert(db, alert_id)
+    """Get alert by ID (only if belongs to user's server)"""
+    alert = await crud_alert.get_alert(db, alert_id, user_id=current_user.id)
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
     return AlertResponse.model_validate(alert)
@@ -62,7 +66,12 @@ async def resolve_alert(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Resolve an alert"""
+    """Resolve an alert (only if belongs to user's server)"""
+    # Verify ownership first
+    alert = await crud_alert.get_alert(db, alert_id, user_id=current_user.id)
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
     alert = await crud_alert.resolve_alert(db, alert_id)
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
@@ -75,7 +84,13 @@ async def create_alert_threshold(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Create a new alert threshold"""
+    """Create a new alert threshold (only for user's servers)"""
+    # Verify server ownership
+    from app.crud import server as crud_server
+    server = await crud_server.get_server(db, threshold_in.server_id, user_id=current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Server not found")
+    
     threshold = await crud_alert.create_alert_threshold(db, threshold_in)
     return AlertThreshold.model_validate(threshold)
 
@@ -87,7 +102,12 @@ async def update_alert_threshold(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Update alert threshold"""
+    """Update alert threshold (only if belongs to user's server)"""
+    # Verify ownership first
+    threshold = await crud_alert.get_alert_threshold(db, threshold_id, user_id=current_user.id)
+    if not threshold:
+        raise HTTPException(status_code=404, detail="Alert threshold not found")
+    
     threshold = await crud_alert.update_alert_threshold(db, threshold_id, threshold_in)
     if not threshold:
         raise HTTPException(status_code=404, detail="Alert threshold not found")
@@ -100,7 +120,12 @@ async def delete_alert_threshold(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Delete alert threshold"""
+    """Delete alert threshold (only if belongs to user's server)"""
+    # Verify ownership first
+    threshold = await crud_alert.get_alert_threshold(db, threshold_id, user_id=current_user.id)
+    if not threshold:
+        raise HTTPException(status_code=404, detail="Alert threshold not found")
+    
     success = await crud_alert.delete_alert_threshold(db, threshold_id)
     if not success:
         raise HTTPException(status_code=404, detail="Alert threshold not found")

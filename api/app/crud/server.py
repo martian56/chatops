@@ -5,17 +5,46 @@ import uuid
 from datetime import datetime
 from app.models.server import Server, ServerStatus
 from app.schemas.server import ServerCreate, ServerUpdate
+from app.crud import api_key as crud_api_key
 
 
-async def get_server(db: AsyncSession, server_id: uuid.UUID) -> Optional[Server]:
-    """Get server by ID"""
+async def get_server(
+    db: AsyncSession, 
+    server_id: uuid.UUID,
+    user_id: Optional[uuid.UUID] = None
+) -> Optional[Server]:
+    """Get server by ID - if user_id is provided, verify ownership"""
     result = await db.execute(select(Server).where(Server.id == server_id))
-    return result.scalar_one_or_none()
+    server = result.scalar_one_or_none()
+    
+    if server and user_id:
+        # Verify that the user owns this server (through API keys)
+        user_server_ids = await crud_api_key.get_user_server_ids(db, user_id)
+        if server.id not in user_server_ids:
+            return None
+    
+    return server
 
 
-async def get_servers(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[Server]:
-    """Get all servers"""
-    result = await db.execute(select(Server).offset(skip).limit(limit))
+async def get_servers(
+    db: AsyncSession, 
+    user_id: Optional[uuid.UUID] = None,
+    skip: int = 0, 
+    limit: int = 100
+) -> List[Server]:
+    """Get servers - if user_id is provided, only return servers owned by that user"""
+    query = select(Server)
+    
+    if user_id:
+        # Get server IDs that belong to this user (through API keys)
+        user_server_ids = await crud_api_key.get_user_server_ids(db, user_id)
+        if not user_server_ids:
+            # User has no servers
+            return []
+        query = query.where(Server.id.in_(user_server_ids))
+    
+    query = query.offset(skip).limit(limit)
+    result = await db.execute(query)
     return list(result.scalars().all())
 
 

@@ -20,8 +20,8 @@ async def get_servers(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get all servers"""
-    servers = await crud_server.get_servers(db, skip=skip, limit=limit)
+    """Get all servers for the current user"""
+    servers = await crud_server.get_servers(db, user_id=current_user.id, skip=skip, limit=limit)
     return [
         ServerResponse(
             id=s.id,
@@ -45,8 +45,8 @@ async def get_server(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get server by ID"""
-    server = await crud_server.get_server(db, server_id)
+    """Get server by ID (only if owned by current user)"""
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     return ServerResponse(
@@ -107,7 +107,12 @@ async def update_server(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Update server"""
+    """Update server (only if owned by current user)"""
+    # Verify ownership first
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="Server not found")
+    
     server = await crud_server.update_server(db, server_id, server_in)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
@@ -144,9 +149,9 @@ async def delete_server(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Delete server"""
-    # Get server info before deletion for audit log
-    server = await crud_server.get_server(db, server_id)
+    """Delete server (only if owned by current user)"""
+    # Verify ownership and get server info before deletion for audit log
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -173,8 +178,8 @@ async def check_server_health(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Check server health (placeholder - will be implemented by agent)"""
-    server = await crud_server.get_server(db, server_id)
+    """Check server health (only if owned by current user)"""
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     

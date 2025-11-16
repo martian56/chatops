@@ -37,8 +37,8 @@ async def create_api_key(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new API key for a server"""
-    # Verify server exists and user has access
-    server = await crud_server.get_server(db, key_in.server_id)
+    # Verify server exists and user owns it
+    server = await crud_server.get_server(db, key_in.server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -68,8 +68,8 @@ async def get_server_api_keys(
     current_user: User = Depends(get_current_user),
 ):
     """Get all API keys for a server"""
-    # Verify server exists
-    server = await crud_server.get_server(db, server_id)
+    # Verify server exists and user owns it
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -83,7 +83,17 @@ async def deactivate_api_key(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Deactivate an API key"""
+    """Deactivate an API key (only if belongs to user's server)"""
+    # Verify ownership first
+    key = await crud_api_key.get_api_key(db, key_id)
+    if not key:
+        raise HTTPException(status_code=404, detail="API key not found")
+    
+    # Verify the API key belongs to a server owned by the user
+    server = await crud_server.get_server(db, key.server_id, user_id=current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="API key not found")
+    
     success = await crud_api_key.deactivate_api_key(db, key_id)
     if not success:
         raise HTTPException(status_code=404, detail="API key not found")
@@ -98,7 +108,17 @@ async def delete_api_key(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Delete an API key"""
+    """Delete an API key (only if belongs to user's server)"""
+    # Verify ownership first
+    key = await crud_api_key.get_api_key(db, key_id)
+    if not key:
+        raise HTTPException(status_code=404, detail="API key not found")
+    
+    # Verify the API key belongs to a server owned by the user
+    server = await crud_server.get_server(db, key.server_id, user_id=current_user.id)
+    if not server:
+        raise HTTPException(status_code=404, detail="API key not found")
+    
     success = await crud_api_key.delete_api_key(db, key_id)
     if not success:
         raise HTTPException(status_code=404, detail="API key not found")

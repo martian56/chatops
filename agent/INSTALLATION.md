@@ -113,6 +113,56 @@ sudo systemctl start chatops-agent
 
 Use NSSM (Non-Sucking Service Manager) or Task Scheduler to run as a service.
 
+## Uninstalling the Agent
+
+### Uninstall .deb Package
+
+If you installed the agent using the .deb package:
+
+```bash
+# Stop and remove the service
+sudo systemctl stop chatops-agent
+sudo systemctl disable chatops-agent
+
+# Remove the package
+sudo dpkg -r chatops-agent
+
+# Or use apt to remove (also removes dependencies)
+sudo apt-get remove chatops-agent
+```
+
+### Uninstall Binary Installation
+
+If you installed the agent as a binary:
+
+```bash
+# Stop the agent if it's running
+pkill chatops-agent
+
+# If running as a systemd service, stop and disable it
+sudo systemctl stop chatops-agent
+sudo systemctl disable chatops-agent
+sudo rm /etc/systemd/system/chatops-agent.service
+sudo systemctl daemon-reload
+
+# Remove the binary and any extracted files
+rm -f chatops-agent chatops-agent-linux-*
+rm -f README.md INSTALLATION.md
+```
+
+### Verify Uninstallation
+
+```bash
+# Check if agent process is running
+ps aux | grep chatops-agent
+
+# Check if service exists
+systemctl status chatops-agent  # Should show "not found" or "inactive"
+
+# Check if binary exists
+which chatops-agent  # Should return nothing
+```
+
 ## Troubleshooting
 
 - **"Failed to fetch server ID"**: Check that your API key is correct and active

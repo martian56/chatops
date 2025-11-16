@@ -33,7 +33,7 @@ async def get_containers(
     current_user: User = Depends(get_current_user),
 ):
     """Get Docker containers for a server (from metrics cache)"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -71,7 +71,7 @@ async def start_container(
     current_user: User = Depends(get_current_user),
 ):
     """Start a Docker container"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -142,7 +142,7 @@ async def stop_container(
     current_user: User = Depends(get_current_user),
 ):
     """Stop a Docker container"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -213,7 +213,7 @@ async def restart_container(
     current_user: User = Depends(get_current_user),
 ):
     """Restart a Docker container"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
@@ -284,7 +284,7 @@ async def get_container_logs(
     current_user: User = Depends(get_current_user),
 ):
     """Get logs for a Docker container"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     

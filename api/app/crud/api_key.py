@@ -110,3 +110,13 @@ async def delete_api_key(db: AsyncSession, key_id: uuid.UUID) -> bool:
     await db.commit()
     return True
 
+
+async def get_user_server_ids(db: AsyncSession, user_id: uuid.UUID) -> List[uuid.UUID]:
+    """Get all server IDs that belong to a user (through API keys they created)"""
+    result = await db.execute(
+        select(APIKey.server_id)
+        .where(APIKey.created_by == user_id)
+        .distinct()
+    )
+    return [row[0] for row in result.all()]
+

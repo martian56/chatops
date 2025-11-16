@@ -32,7 +32,7 @@ async def execute_command(
     current_user: User = Depends(get_current_user),
 ):
     """Execute a command on a server"""
-    server = await crud_server.get_server(db, server_id)
+    server = await crud_server.get_server(db, server_id, user_id=current_user.id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     
