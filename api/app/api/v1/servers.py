@@ -71,7 +71,7 @@ async def create_server(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new server"""
-    server = await crud_server.create_server(db, server_in)
+    server = await crud_server.create_server(db, server_in, current_user.id)
     
     # Log audit event
     await log_audit(

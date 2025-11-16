@@ -19,7 +19,7 @@ class APIKey(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)  # User who created it
 
-    # Relationships
-    server = relationship("Server", backref="api_keys")
+    # Relationships - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="api_keys", passive_deletes=True)
     creator = relationship("User", foreign_keys=[created_by])
 

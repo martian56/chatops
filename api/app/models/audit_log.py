@@ -48,7 +48,7 @@ class AuditLog(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True)
-    server_id = Column(UUID(as_uuid=True), ForeignKey("servers.id"), nullable=True, index=True)
+    server_id = Column(UUID(as_uuid=True), ForeignKey("servers.id", ondelete="SET NULL"), nullable=True, index=True)
     action = Column(SQLEnum(AuditAction), nullable=False, index=True)
     timestamp = Column(DateTime(timezone=True), nullable=False, index=True, server_default=func.now())
     ip_address = Column(String, nullable=True)
@@ -58,7 +58,7 @@ class AuditLog(Base):
     success = Column(Boolean, nullable=False, default=True)  # Whether action succeeded
     error_message = Column(Text, nullable=True)
 
-    # Relationships
+    # Relationships - passive_deletes=True lets database handle CASCADE/SET NULL
     user = relationship("User", backref="audit_logs")
-    server = relationship("Server", backref="audit_logs")
+    server = relationship("Server", backref="audit_logs", passive_deletes=True)
 

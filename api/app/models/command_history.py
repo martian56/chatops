@@ -33,7 +33,7 @@ class CommandHistory(Base):
     duration_ms = Column(Integer, nullable=True)  # Duration in milliseconds
     error_message = Column(Text, nullable=True)
 
-    # Relationships
-    server = relationship("Server", backref="command_history")
+    # Relationships - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="command_history", passive_deletes=True)
     user = relationship("User", backref="command_history")
 

@@ -29,6 +29,6 @@ class ConnectionEvent(Base):
     duration_seconds = Column(Integer, nullable=True)  # For disconnect events, how long was connected
     extra_data = Column(Text, nullable=True)  # JSON string for additional context
 
-    # Relationship
-    server = relationship("Server", backref="connection_events")
+    # Relationship - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="connection_events", passive_deletes=True)
 

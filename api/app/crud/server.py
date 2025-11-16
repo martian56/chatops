@@ -5,7 +5,6 @@ import uuid
 from datetime import datetime
 from app.models.server import Server, ServerStatus
 from app.schemas.server import ServerCreate, ServerUpdate
-from app.crud import api_key as crud_api_key
 
 
 async def get_server(
@@ -14,16 +13,14 @@ async def get_server(
     user_id: Optional[uuid.UUID] = None
 ) -> Optional[Server]:
     """Get server by ID - if user_id is provided, verify ownership"""
-    result = await db.execute(select(Server).where(Server.id == server_id))
-    server = result.scalar_one_or_none()
+    query = select(Server).where(Server.id == server_id)
     
-    if server and user_id:
-        # Verify that the user owns this server (through API keys)
-        user_server_ids = await crud_api_key.get_user_server_ids(db, user_id)
-        if server.id not in user_server_ids:
-            return None
+    # If user_id provided, verify ownership directly
+    if user_id:
+        query = query.where(Server.user_id == user_id)
     
-    return server
+    result = await db.execute(query)
+    return result.scalar_one_or_none()
 
 
 async def get_servers(
@@ -36,25 +33,24 @@ async def get_servers(
     query = select(Server)
     
     if user_id:
-        # Get server IDs that belong to this user (through API keys)
-        user_server_ids = await crud_api_key.get_user_server_ids(db, user_id)
-        if not user_server_ids:
-            # User has no servers
-            return []
-        query = query.where(Server.id.in_(user_server_ids))
+        # Filter by user ownership directly
+        query = query.where(Server.user_id == user_id)
     
     query = query.offset(skip).limit(limit)
     result = await db.execute(query)
     return list(result.scalars().all())
 
 
-async def create_server(db: AsyncSession, server_in: ServerCreate) -> Server:
+async def create_server(db: AsyncSession, server_in: ServerCreate, user_id: uuid.UUID) -> Server:
     """Create a new server"""
     # Use by_alias=False to get actual field names (server_metadata, not metadata)
     data = server_in.model_dump(by_alias=False, exclude_none=True)
     # Ensure server_metadata is explicitly set (None or dict, not missing)
     if "server_metadata" not in data:
         data["server_metadata"] = None
+    
+    # Add user_id
+    data["user_id"] = user_id
     
     db_server = Server(**data)
     db.add(db_server)

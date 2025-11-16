@@ -40,8 +40,8 @@ class Alert(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     resolved_at = Column(DateTime(timezone=True), nullable=True)
 
-    # Relationship
-    server = relationship("Server", backref="alerts")
+    # Relationship - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="alerts", passive_deletes=True)
 
 
 class AlertThreshold(Base):
@@ -56,6 +56,6 @@ class AlertThreshold(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationship
-    server = relationship("Server", backref="thresholds")
+    # Relationship - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="thresholds", passive_deletes=True)
 

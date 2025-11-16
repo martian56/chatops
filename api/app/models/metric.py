@@ -42,8 +42,8 @@ class Metric(Base):
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationship
-    server = relationship("Server", backref="metrics")
+    # Relationship - passive_deletes=True lets database handle CASCADE
+    server = relationship("Server", backref="metrics", passive_deletes=True)
 
     # Composite index for efficient time-series queries
     __table_args__ = (
