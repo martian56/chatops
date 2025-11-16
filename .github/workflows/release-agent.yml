@@ -77,8 +77,18 @@ jobs:
         run: |
           chmod +x scripts/build-deb.sh
           ./scripts/build-deb.sh ${{ steps.version.outputs.version }} ${{ matrix.arch }}
-          cp dist/*.deb release/ 2>/dev/null || true
-          cp dist/*.deb.sha256 release/ 2>/dev/null || true
+          # Copy .deb files (version will be without 'v' prefix)
+          DEB_VERSION="${VERSION#v}"
+          cp dist/chatops-agent_${DEB_VERSION}_${{ matrix.arch }}.deb release/ 2>/dev/null || true
+          cp dist/chatops-agent_${DEB_VERSION}_${{ matrix.arch }}.deb.sha256 release/ 2>/dev/null || true
+      
+      - name: Get deb version (without v prefix)
+        id: deb_version
+        run: |
+          DEB_VERSION="${VERSION#v}"
+          echo "deb_version=${DEB_VERSION}" >> $GITHUB_OUTPUT
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -87,8 +97,8 @@ jobs:
           path: |
             agent/release/chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz
             agent/release/chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz.sha256
-            agent/release/chatops-agent_${{ steps.version.outputs.version }}_${{ matrix.arch }}.deb
-            agent/release/chatops-agent_${{ steps.version.outputs.version }}_${{ matrix.arch }}.deb.sha256
+            agent/release/chatops-agent_${{ steps.deb_version.outputs.deb_version }}_${{ matrix.arch }}.deb
+            agent/release/chatops-agent_${{ steps.deb_version.outputs.deb_version }}_${{ matrix.arch }}.deb.sha256
           retention-days: 30
   
   release:
@@ -107,6 +117,9 @@ jobs:
             VERSION=${GITHUB_REF#refs/tags/}
           fi
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          # Also create deb_version without 'v' prefix
+          DEB_VERSION="${VERSION#v}"
+          echo "deb_version=${DEB_VERSION}" >> $GITHUB_OUTPUT
       
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -122,8 +135,8 @@ jobs:
             ### Downloads
             
             #### Debian/Ubuntu (.deb packages)
-            - **AMD64**: `chatops-agent_${{ steps.version.outputs.version }}_amd64.deb`
-            - **ARM64**: `chatops-agent_${{ steps.version.outputs.version }}_arm64.deb`
+            - **AMD64**: `chatops-agent_${{ steps.version.outputs.deb_version }}_amd64.deb`
+            - **ARM64**: `chatops-agent_${{ steps.version.outputs.deb_version }}_arm64.deb`
             
             #### Binary Archives
             - **Linux AMD64**: `chatops-agent-linux-amd64-${{ steps.version.outputs.version }}.tar.gz`
@@ -134,7 +147,7 @@ jobs:
             #### Debian/Ubuntu (Recommended)
             ```bash
             # Install .deb package
-            sudo dpkg -i chatops-agent_${{ steps.version.outputs.version }}_amd64.deb
+            sudo dpkg -i chatops-agent_${{ steps.version.outputs.deb_version }}_amd64.deb
             sudo apt-get install -f  # Install dependencies if needed
             ```
             
