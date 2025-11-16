@@ -1,0 +1,156 @@
+name: Release Agent
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      
+      - name: Install dpkg tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev fakeroot
+      
+      - name: Get version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+      
+      - name: Build Linux binary
+        working-directory: ./agent
+        env:
+          GOOS: linux
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0
+        run: |
+          go build -ldflags "-X main.version=${{ steps.version.outputs.version }}" \
+            -o chatops-agent-linux-${{ matrix.arch }} \
+            ./main.go
+      
+      - name: Create archive
+        working-directory: ./agent
+        run: |
+          mkdir -p release
+          cp chatops-agent-linux-${{ matrix.arch }} release/
+          cp README.md release/
+          cp INSTALLATION.md release/
+          cd release
+          tar -czf chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz *
+          sha256sum chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz > \
+            chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz.sha256
+          cd ..
+      
+      - name: Build .deb package
+        working-directory: ./agent
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          chmod +x scripts/build-deb.sh
+          ./scripts/build-deb.sh ${{ steps.version.outputs.version }} ${{ matrix.arch }}
+          cp dist/*.deb release/ 2>/dev/null || true
+          cp dist/*.deb.sha256 release/ 2>/dev/null || true
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chatops-agent-linux-${{ matrix.arch }}
+          path: |
+            agent/release/chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz
+            agent/release/chatops-agent-linux-${{ matrix.arch }}-${{ steps.version.outputs.version }}.tar.gz.sha256
+            agent/release/chatops-agent_${{ steps.version.outputs.version }}_${{ matrix.arch }}.deb
+            agent/release/chatops-agent_${{ steps.version.outputs.version }}_${{ matrix.arch }}.deb.sha256
+          retention-days: 30
+  
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ChatOps Agent ${{ steps.version.outputs.version }}
+          body: |
+            ## ChatOps Agent ${{ steps.version.outputs.version }}
+            
+            ### Downloads
+            
+            #### Debian/Ubuntu (.deb packages)
+            - **AMD64**: `chatops-agent_${{ steps.version.outputs.version }}_amd64.deb`
+            - **ARM64**: `chatops-agent_${{ steps.version.outputs.version }}_arm64.deb`
+            
+            #### Binary Archives
+            - **Linux AMD64**: `chatops-agent-linux-amd64-${{ steps.version.outputs.version }}.tar.gz`
+            - **Linux ARM64**: `chatops-agent-linux-arm64-${{ steps.version.outputs.version }}.tar.gz`
+            
+            ### Installation
+            
+            #### Debian/Ubuntu (Recommended)
+            ```bash
+            # Install .deb package
+            sudo dpkg -i chatops-agent_${{ steps.version.outputs.version }}_amd64.deb
+            sudo apt-get install -f  # Install dependencies if needed
+            ```
+            
+            #### Binary Archive
+            ```bash
+            # Extract and run
+            tar -xzf chatops-agent-linux-amd64-${{ steps.version.outputs.version }}.tar.gz
+            ./chatops-agent-linux-amd64 -api-key YOUR_API_KEY
+            ```
+            
+            See [INSTALLATION.md](INSTALLATION.md) for detailed installation instructions.
+          files: |
+            agent/release/*.tar.gz
+            agent/release/*.tar.gz.sha256
+            agent/release/*.deb
+            agent/release/*.deb.sha256
+          draft: false
+          prerelease: false
+

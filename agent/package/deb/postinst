@@ -1,0 +1,12 @@
+#!/bin/bash
+# Post-installation script for chatops-agent
+
+# Enable and start the service if systemd is available
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl daemon-reload
+    systemctl enable chatops-agent.service 2>/dev/null || true
+    echo "Service enabled. Start it with: systemctl start chatops-agent"
+fi
+
+exit 0
+

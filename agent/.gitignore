@@ -1,2 +1,9 @@
 chatops-agent.exe
 chatops-agent
+chatops-agent-*
+dist/
+release/
+build/
+*.tar.gz
+*.sha256
+*.deb

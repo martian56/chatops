@@ -1,0 +1,12 @@
+Package: chatops-agent
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: ChatOps Team <support@chatops.com>
+Description: ChatOps Agent - Server monitoring and management agent
+ ChatOps Agent is a lightweight agent that runs on servers to collect
+ metrics, manage Docker containers, and execute commands remotely.
+Depends: docker.io | docker-ce
+Recommends: systemd
+

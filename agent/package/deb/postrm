@@ -1,0 +1,11 @@
+#!/bin/bash
+# Post-removal script for chatops-agent
+
+# Disable the service after removal
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl disable chatops-agent.service 2>/dev/null || true
+    systemctl daemon-reload
+fi
+
+exit 0
+

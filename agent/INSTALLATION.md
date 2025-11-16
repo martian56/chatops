@@ -2,6 +2,11 @@
 
 ## Quick Start
 
+### Installation Methods
+
+- **Debian/Ubuntu (.deb package)** - Recommended for Debian-based systems
+- **Binary Archive** - For any Linux distribution
+
 ### 1. Create an API Key
 
 1. Log into the ChatOps web interface
@@ -13,16 +18,49 @@
 
 ### 2. Install the Agent
 
-#### Build the Agent
+#### Option A: Debian/Ubuntu Package (Recommended)
+
+```bash
+# Download the .deb package from GitHub Releases
+wget https://github.com/your-org/chatops/releases/download/v1.0.0/chatops-agent_1.0.0_amd64.deb
+
+# Install the package
+sudo dpkg -i chatops-agent_1.0.0_amd64.deb
+sudo apt-get install -f  # Install dependencies if needed
+
+# Edit the service file with your API key
+sudo systemctl edit chatops-agent.service
+# Add: Environment="CHATOPS_API_KEY=your-api-key-here"
+
+# Or edit the service file directly
+sudo nano /lib/systemd/system/chatops-agent.service
+# Replace YOUR_API_KEY_HERE with your actual API key
+
+# Reload systemd and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable chatops-agent
+sudo systemctl start chatops-agent
+
+# Check status
+sudo systemctl status chatops-agent
+```
+
+#### Option B: Binary Archive
+
+```bash
+# Download from GitHub Releases
+wget https://github.com/your-org/chatops/releases/download/v1.0.0/chatops-agent-linux-amd64-1.0.0.tar.gz
+tar -xzf chatops-agent-linux-amd64-1.0.0.tar.gz
+
+# Run the agent
+./chatops-agent-linux-amd64 -api-key YOUR_API_KEY_HERE
+```
+
+#### Option C: Build from Source
 
 ```bash
 cd agent
 go build -o chatops-agent
-```
-
-#### Run the Agent
-
-```bash
 ./chatops-agent -api-key YOUR_API_KEY_HERE
 ```
 

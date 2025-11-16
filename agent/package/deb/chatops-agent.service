@@ -1,0 +1,19 @@
+[Unit]
+Description=ChatOps Agent
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/chatops-agent -api-key YOUR_API_KEY_HERE
+Environment="CHATOPS_API_KEY="
+Environment="CHATOPS_API_URL="
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
