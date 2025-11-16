@@ -15,7 +15,7 @@ import (
 
 func main() {
 	// Parse command line flags
-	apiURL := flag.String("api-url", "http://localhost:8000", "API server URL")
+	apiURL := flag.String("api-url", "https://chatops.onrender.com", "API server URL")
 	apiKey := flag.String("api-key", "", "API key for authentication")
 	configPath := flag.String("config", "", "Path to config file (optional)")
 	flag.Parse()

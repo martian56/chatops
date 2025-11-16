@@ -8,7 +8,7 @@ Type=simple
 User=root
 ExecStart=/usr/bin/chatops-agent -api-key YOUR_API_KEY_HERE
 Environment="CHATOPS_API_KEY="
-Environment="CHATOPS_API_URL="
+Environment="CHATOPS_API_URL=https://chatops.onrender.com"
 Restart=always
 RestartSec=10
 StandardOutput=journal

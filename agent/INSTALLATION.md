@@ -22,7 +22,7 @@
 
 ```bash
 # Download the .deb package from GitHub Releases
-wget https://github.com/your-org/chatops/releases/download/v1.0.0/chatops-agent_1.0.0_amd64.deb
+wget https://github.com/your-org/chatops/releases/download/v1.0.3/chatops-agent_1.0.3_amd64.deb
 
 # Install the package
 sudo dpkg -i chatops-agent_1.0.0_amd64.deb
@@ -33,7 +33,7 @@ sudo systemctl edit chatops-agent.service
 # Add: Environment="CHATOPS_API_KEY=your-api-key-here"
 
 # Or edit the service file directly
-sudo nano /lib/systemd/system/chatops-agent.service
+sudo nano /usr/lib/systemd/system/chatops-agent.service
 # Replace YOUR_API_KEY_HERE with your actual API key
 
 # Reload systemd and start the service
@@ -49,8 +49,8 @@ sudo systemctl status chatops-agent
 
 ```bash
 # Download from GitHub Releases
-wget https://github.com/your-org/chatops/releases/download/v1.0.0/chatops-agent-linux-amd64-1.0.0.tar.gz
-tar -xzf chatops-agent-linux-amd64-1.0.0.tar.gz
+wget https://github.com/your-org/chatops/releases/download/v1.0.3/chatops-agent-linux-amd64-1.0.3.tar.gz
+tar -xzf chatops-agent-linux-amd64-1.0.3.tar.gz
 
 # Run the agent
 ./chatops-agent-linux-amd64 -api-key YOUR_API_KEY_HERE
@@ -68,7 +68,6 @@ Or using environment variables:
 
 ```bash
 export CHATOPS_API_KEY="your-api-key-here"
-export CHATOPS_API_URL="http://your-api-server:8000"  # Optional, defaults to localhost:8000
 ./chatops-agent
 ```
 

@@ -37,7 +37,7 @@ func Load(configPath, apiURL, apiKey, serverID string) (*Config, error) {
 	if cfg.APIURL == "" {
 		cfg.APIURL = os.Getenv("CHATOPS_API_URL")
 		if cfg.APIURL == "" {
-			cfg.APIURL = "http://localhost:8000"
+			cfg.APIURL = "https://chatops.onrender.com"
 		}
 	}
 

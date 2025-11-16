@@ -22,20 +22,19 @@ go build -o chatops-agent ./main.go
 
 ```bash
 ./chatops-agent \
-  -api-url http://localhost:8000 \
   -api-key YOUR_API_KEY
 ```
 
-**Note**: The server ID is automatically determined from the API key - you don't need to specify it!
+**Note**: The server ID is automatically determined from the API key - you don't need to specify it! The default API URL is `https://chatops.onrender.com`.
 
 ### Environment Variables
 
-- `CHATOPS_API_URL` - API server URL (default: http://localhost:8000)
+- `CHATOPS_API_URL` - API server URL (default: https://chatops.onrender.com)
 - `CHATOPS_API_KEY` - API key for authentication (required)
 
 ### Command Line Flags
 
-- `-api-url` - API server URL
+- `-api-url` - API server URL (default: https://chatops.onrender.com)
 - `-api-key` - API key for authentication
 - `-server-id` - Server ID
 - `-config` - Path to config file (optional)
