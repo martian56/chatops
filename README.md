@@ -1,6 +1,6 @@
 # ChatOps
 
-**Unified Server Monitoring & Management Platform**
+**Unified Server Monitoring & Management & Devops Platform**
 
 Monitor and manage all your servers from a single, intuitive web dashboard. Real-time metrics, Docker container control, alerts, and terminal access—all in one place.
 

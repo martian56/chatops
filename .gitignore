@@ -12,6 +12,8 @@ ENV/
 dist/
 build/
 *.egg
+link.md
+prj.md
 
 # Node
 node_modules/
