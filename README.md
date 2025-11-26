@@ -30,7 +30,7 @@ Deploy a lightweight agent on each server, and start monitoring immediately. No 
 4. Enter a name for your server (e.g., "Production Web Server")
 5. Click **"Create"**
 
-### Step 2: Generate an API Key
+### Step 2: Generate an API Key (keep as super secret)
 
 1. Click on your newly created server
 2. Go to the **"API Keys"** tab
