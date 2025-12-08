@@ -1,9 +1,14 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 import re
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True
+    )
+    
     # Database
     DATABASE_URL: str
     
@@ -21,10 +26,6 @@ class Settings(BaseSettings):
     
     # WebSocket
     WS_PATH: str = "/ws"
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
     
     @property
     def async_database_url(self) -> str:

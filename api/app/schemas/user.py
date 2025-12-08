@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator, model_validator
 from datetime import datetime
 from typing import Optional
 import uuid
@@ -55,12 +55,11 @@ class PasswordChange(BaseModel):
 
 
 class UserInDB(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     is_active: bool
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class User(UserInDB):
@@ -68,10 +67,9 @@ class User(UserInDB):
 
 
 class UserResponse(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     is_active: bool
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 

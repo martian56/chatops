@@ -167,7 +167,7 @@ jobs:
             ./chatops-agent-linux-amd64 -api-key YOUR_API_KEY
             ```
             
-            See [INSTALLATION.md](INSTALLATION.md) for detailed installation instructions.
+            See [INSTALLATION.md](agent/INSTALLATION.md) for detailed installation instructions.
           files: |
             release-files/*
           draft: false

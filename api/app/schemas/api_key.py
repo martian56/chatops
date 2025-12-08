@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 import uuid
@@ -14,6 +14,8 @@ class APIKeyCreate(APIKeyBase):
 
 
 class APIKeyResponse(APIKeyBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: uuid.UUID
     key: str  # Only returned on creation
@@ -21,18 +23,14 @@ class APIKeyResponse(APIKeyBase):
     last_used: Optional[datetime] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class APIKeyInfo(APIKeyBase):
     """API key info without the actual key"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: uuid.UUID
     is_active: bool
     last_used: Optional[datetime] = None
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 

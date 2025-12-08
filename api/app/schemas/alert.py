@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 import uuid
@@ -19,13 +19,12 @@ class AlertCreate(AlertBase):
 
 
 class AlertResponse(AlertBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     resolved: bool
     created_at: datetime
     resolved_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
 
 
 class Alert(AlertResponse):
@@ -52,10 +51,9 @@ class AlertThresholdUpdate(BaseModel):
 
 
 class AlertThreshold(AlertThresholdBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     created_at: datetime
     updated_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
 

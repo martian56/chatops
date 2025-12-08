@@ -1,12 +1,25 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1 import api_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events."""
+    # Startup
+    # Database schema is managed by Alembic migrations
+    # Run 'alembic upgrade head' to apply migrations
+    yield
+    # Shutdown (if needed)
+
+
 app = FastAPI(
     title="ChatOps API",
     description="Server management and monitoring API",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -20,14 +33,6 @@ app.add_middleware(
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Startup event - database schema managed by Alembic migrations"""
-    # Database schema is managed by Alembic migrations
-    # Run 'alembic upgrade head' to apply migrations
-    pass
 
 
 @app.get("/")

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -19,10 +19,9 @@ class LogEntryCreate(LogEntryBase):
 
 
 class LogEntryResponse(LogEntryBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: Optional[uuid.UUID]
     timestamp: datetime
-
-    class Config:
-        from_attributes = True
 
