@@ -15,8 +15,9 @@ RUN useradd -m -u 1000 appuser
 
 COPY . .
 
-# Set ownership and permissions
-RUN chown -R appuser:appuser /app && \
+# Convert line endings (CRLF to LF) and set ownership/permissions
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && \
+    chown -R appuser:appuser /app && \
     chmod +x /app/docker-entrypoint.sh
 
 # Switch to non-root user
