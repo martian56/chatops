@@ -102,7 +102,7 @@ jobs:
 
           resp = requests.post(upload_url, files=files_to_upload, headers=headers, data={'website_id': WEBSITE_ID}, timeout=120)
           print('🧾 Upload response:', resp.status_code)
-          print(resp.text[:1000])
+          print(resp.text)
 
           if resp.status_code not in (200, 201):
               raise SystemExit('❌ Upload failed')
