@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api/auth';
 import { useAuthStore } from '../store/auth';
+import { getAuthErrorMessage, getRegisterErrorMessage } from '../utils/errorMessages';
 
 export const useAuth = () => {
   const { user, isAuthenticated, setAuth, clearAuth } = useAuthStore();
@@ -53,6 +54,10 @@ export const useAuth = () => {
     retry: false,
   });
 
+  // Get user-friendly error messages
+  const loginError = loginMutation.error ? getAuthErrorMessage(loginMutation.error) : null;
+  const registerError = registerMutation.error ? getRegisterErrorMessage(registerMutation.error) : null;
+
   return {
     user: user || currentUser,
     isAuthenticated,
@@ -60,7 +65,8 @@ export const useAuth = () => {
     register: registerMutation.mutate,
     logout: () => logoutMutation.mutate(),
     isLoading: loginMutation.isPending || registerMutation.isPending,
-    error: loginMutation.error || registerMutation.error,
+    error: loginError || registerError,
+    rawError: loginMutation.error || registerMutation.error,
   };
 };
 

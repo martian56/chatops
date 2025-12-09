@@ -124,7 +124,7 @@ export const RegisterPage = () => {
             </div>
             {(validationError || error) && (
               <div className="text-sm text-destructive">
-                {validationError || (error instanceof Error ? error.message : 'Registration failed')}
+                {validationError || error}
               </div>
             )}
           </CardContent>
