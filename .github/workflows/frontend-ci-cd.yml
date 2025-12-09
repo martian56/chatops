@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  frontend-check:
+  build-and-test:
     runs-on: ubuntu-latest
     env:
       VITE_API_URL: ${{ secrets.VITE_API_URL }}
@@ -31,6 +31,29 @@ jobs:
       # Uncomment this if you want linting enabled
       # - name: Lint
       #   run: npm --prefix web run lint
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.3.0'
+          cache: 'npm'
+          cache-dependency-path: 'web/package-lock.json'
+
+      - name: Install dependencies
+        run: npm --prefix web ci --legacy-peer-deps
+
+      - name: Build (TS compile + Vite build)
+        run: npm --prefix web run build
 
       - name: Setup Python for upload step
         uses: actions/setup-python@v4
