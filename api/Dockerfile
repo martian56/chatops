@@ -10,10 +10,17 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Create non-root user
+RUN useradd -m -u 1000 appuser
+
 COPY . .
 
-# Set permissions for entrypoint script
-RUN chmod +x /app/docker-entrypoint.sh
+# Set ownership and permissions
+RUN chown -R appuser:appuser /app && \
+    chmod +x /app/docker-entrypoint.sh
+
+# Switch to non-root user
+USER appuser
 
 EXPOSE 8000
 
