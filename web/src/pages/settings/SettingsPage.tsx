@@ -21,6 +21,13 @@ export const SettingsPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
+  // Initialize theme from localStorage or DOM
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 
+      (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    setTheme(savedTheme as 'light' | 'dark');
+  }, []);
+
   // Initialize fullName from user data
   useEffect(() => {
     if (user?.full_name !== undefined) {
@@ -75,7 +82,12 @@ export const SettingsPage = () => {
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   return (

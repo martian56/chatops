@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -25,6 +25,8 @@ class CommandHistoryUpdate(BaseModel):
 
 
 class CommandHistoryResponse(CommandHistoryBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: uuid.UUID
     user_id: Optional[uuid.UUID]
@@ -35,7 +37,4 @@ class CommandHistoryResponse(CommandHistoryBase):
     completed_at: Optional[datetime]
     duration_ms: Optional[int]
     error_message: Optional[str]
-
-    class Config:
-        from_attributes = True
 

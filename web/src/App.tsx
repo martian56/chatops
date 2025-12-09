@@ -29,8 +29,13 @@ function App() {
   useEffect(() => {
     // Initialize auth on app start
     initialize();
-    // Set dark mode by default
-    document.documentElement.classList.add('dark');
+    // Initialize theme from localStorage or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, []);
 
   return (

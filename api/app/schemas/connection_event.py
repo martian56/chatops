@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -20,10 +20,9 @@ class ConnectionEventCreate(ConnectionEventBase):
 
 
 class ConnectionEventResponse(ConnectionEventBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: uuid.UUID
     timestamp: datetime
-
-    class Config:
-        from_attributes = True
 

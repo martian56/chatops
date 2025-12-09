@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any
 from datetime import datetime
 import uuid
@@ -29,11 +29,10 @@ class MetricCreate(MetricBase):
 
 
 class MetricResponse(MetricBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: uuid.UUID
     server_id: uuid.UUID
     timestamp: datetime
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 

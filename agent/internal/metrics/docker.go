@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/chatops/agent/internal/api"
 )
@@ -40,7 +40,7 @@ func NewDockerClient() (*DockerClient, error) {
 
 // GetContainers retrieves all Docker containers
 func (d *DockerClient) GetContainers(ctx context.Context) ([]api.DockerContainer, error) {
-	containers, err := d.cli.ContainerList(ctx, types.ContainerListOptions{All: true})
+	containers, err := d.cli.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list containers: %w", err)
 	}
@@ -95,7 +95,7 @@ func (d *DockerClient) GetContainers(ctx context.Context) ([]api.DockerContainer
 
 // GetContainerLogs retrieves logs for a specific container
 func (d *DockerClient) GetContainerLogs(ctx context.Context, containerID string, tail int) ([]string, error) {
-	options := types.ContainerLogsOptions{
+	options := container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Tail:       fmt.Sprintf("%d", tail),
@@ -152,7 +152,7 @@ func (d *DockerClient) GetContainerLogs(ctx context.Context, containerID string,
 
 // StartContainer starts a Docker container
 func (d *DockerClient) StartContainer(ctx context.Context, containerID string) error {
-	return d.cli.ContainerStart(ctx, containerID, types.ContainerStartOptions{})
+	return d.cli.ContainerStart(ctx, containerID, container.StartOptions{})
 }
 
 // StopContainer stops a Docker container
@@ -161,9 +161,8 @@ func (d *DockerClient) StopContainer(ctx context.Context, containerID string, ti
 	if timeoutSeconds != nil {
 		timeout = *timeoutSeconds
 	}
-	// ContainerStop takes a timeout duration
-	timeoutDuration := time.Duration(timeout) * time.Second
-	return d.cli.ContainerStop(ctx, containerID, &timeoutDuration)
+	// ContainerStop takes StopOptions with timeout in seconds
+	return d.cli.ContainerStop(ctx, containerID, container.StopOptions{Timeout: &timeout})
 }
 
 // RestartContainer restarts a Docker container
@@ -172,9 +171,8 @@ func (d *DockerClient) RestartContainer(ctx context.Context, containerID string,
 	if timeoutSeconds != nil {
 		timeout = *timeoutSeconds
 	}
-	// ContainerRestart takes a timeout duration
-	timeoutDuration := time.Duration(timeout) * time.Second
-	return d.cli.ContainerRestart(ctx, containerID, &timeoutDuration)
+	// ContainerRestart takes StopOptions with timeout in seconds
+	return d.cli.ContainerRestart(ctx, containerID, container.StopOptions{Timeout: &timeout})
 }
 
 // Close closes the Docker client
