@@ -18,17 +18,17 @@ jobs:
         with:
           node-version: '24.3.0'
           cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          cache-dependency-path: 'web/package-lock.json'
 
       - name: Install dependencies
-        run: npm --prefix frontend ci --legacy-peer-deps
+        run: npm --prefix web ci --legacy-peer-deps
 
       - name: Build (TS compile + Vite build)
-        run: npm --prefix frontend run build
+        run: npm --prefix web run build
 
       # Uncomment this if you want linting enabled
       # - name: Lint
-      #   run: npm --prefix frontend run lint
+      #   run: npm --prefix web run lint
 
       - name: Setup Python for upload step
         uses: actions/setup-python@v4
@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd frontend
+          cd web
 
           if [ ! -d dist ]; then
             echo "❌ dist folder not found - nothing to upload"
