@@ -1,0 +1,34 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: chatops-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/chatops
+      - SECRET_KEY=your-secret-key-change-in-production
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    depends_on:
+      - db
+    volumes:
+      - ./api/.env:/app/.env  # Mount .env file if it exists
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: chatops-db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=chatops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

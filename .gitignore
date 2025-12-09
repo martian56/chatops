@@ -79,4 +79,5 @@ htmlcov/
 *.temp
 .cache/
 
-
+# Architecture
+ARCHITECTURE.md
