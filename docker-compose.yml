@@ -9,7 +9,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/chatops
       - SECRET_KEY=your-secret-key-change-in-production
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+      - 'CORS_ORIGINS=["http://localhost:5173","http://localhost:3000"]'
     depends_on:
       - db
     volumes:
