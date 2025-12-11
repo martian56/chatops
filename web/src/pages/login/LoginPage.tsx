@@ -57,7 +57,7 @@ export const LoginPage = () => {
             </div>
             {error && (
               <div className="text-sm text-destructive">
-                {error instanceof Error ? error.message : 'Login failed'}
+                {error}
               </div>
             )}
           </CardContent>
