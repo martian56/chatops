@@ -1,3 +1,5 @@
+# FastAPI application entry point
+# CI/CD: Changes here trigger API build and test workflow
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

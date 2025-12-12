@@ -1,4 +1,5 @@
 name: Deploy Documentation
+# CI/CD: Build and deploy MkDocs documentation to Cloudflare Pages
 
 on:
   push:

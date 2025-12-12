@@ -1,3 +1,5 @@
+// ChatOps Agent - Go application for server monitoring
+// CI/CD: Version tags (v*) trigger release workflow to build binaries and .deb packages
 package main
 
 import (

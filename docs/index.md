@@ -1,4 +1,5 @@
 # ChatOps Documentation
+<!-- CI/CD: Changes to documentation trigger automatic deployment to Cloudflare Pages -->
 
 Welcome to the ChatOps documentation! ChatOps is a comprehensive server monitoring and management platform that enables you to monitor, manage, and control your servers from a single, intuitive web dashboard.
 

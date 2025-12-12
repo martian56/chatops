@@ -1,4 +1,5 @@
 name: API - Build & Test
+# CI/CD: Automated testing for FastAPI backend on pull requests
 
 on:
   pull_request:
