@@ -145,7 +145,7 @@ export const ServersPage = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Servers</h1>
-            <p className="text-muted-foreground">Manage and monitor your servers</p>
+            <p className="text-muted-foreground">Manage and monitor your servers and Life</p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

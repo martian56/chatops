@@ -1,4 +1,6 @@
 name: Release Agent
+# CI/CD: Build and release Go agent binaries (.deb packages and archives) for multiple architectures
+# Triggers: Version tags (v*) or manual workflow dispatch
 
 on:
   push:

@@ -1,4 +1,5 @@
 name: Frontend - Build & Deploy
+# CI/CD: Build, test, and deploy React frontend to hosting service
 
 on:
   pull_request:

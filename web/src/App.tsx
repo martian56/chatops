@@ -1,3 +1,5 @@
+// React application root component
+// CI/CD: Changes here trigger frontend build and deployment workflow
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
