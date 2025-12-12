@@ -47,6 +47,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run database migrations
+        working-directory: ./api
+        run: alembic upgrade head
+
       - name: Run tests
         working-directory: ./api
         run: pytest -v
