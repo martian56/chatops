@@ -1,0 +1,42 @@
+name: API - Continuous Delivery
+
+# This workflow runs on any push to the 'main' branch
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'api/**'
+      - '.github/workflows/api-cd.yml'
+
+# Define the single job for building and pushing the image
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # Grant permissions for the job to write to the container registry
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      # Step 1: Check out the repository's code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Step 2: Log in to the GitHub Container Registry (GHCR)
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Step 3: Build and push the Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/chatops-api:latest
+            ghcr.io/${{ github.repository_owner }}/chatops-api:${{ github.sha }}
