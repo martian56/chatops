@@ -81,3 +81,7 @@ htmlcov/
 
 # Architecture
 ARCHITECTURE.md
+
+# Documentation
+site/
+.cache/
