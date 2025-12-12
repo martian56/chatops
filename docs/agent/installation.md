@@ -14,10 +14,10 @@ Complete installation guide for the ChatOps agent.
 
 ```bash
 # Download the .deb package
-wget https://github.com/martian56/chatops/releases/download/v1.0.3/chatops-agent_1.0.3_amd64.deb
+wget https://github.com/martian56/chatops/releases/download/v1.0.4/chatops-agent_1.0.4_amd64.deb
 
 # Install the package
-sudo dpkg -i chatops-agent_1.0.3_amd64.deb
+sudo dpkg -i chatops-agent_1.0.4_amd64.deb
 sudo apt-get install -f  # Install dependencies if needed
 
 # Configure the API key
@@ -41,8 +41,8 @@ sudo systemctl status chatops-agent
 
 ```bash
 # Download the binary archive
-wget https://github.com/martian56/chatops/releases/download/v1.0.3/chatops-agent-linux-amd64-1.0.3.tar.gz
-tar -xzf chatops-agent-linux-amd64-1.0.3.tar.gz
+wget https://github.com/martian56/chatops/releases/download/v1.0.4/chatops-agent-linux-amd64-1.0.4.tar.gz
+tar -xzf chatops-agent-linux-amd64-1.0.4.tar.gz
 
 # Run the agent
 ./chatops-agent-linux-amd64 -api-key YOUR_API_KEY_HERE
